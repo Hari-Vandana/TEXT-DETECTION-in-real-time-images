@@ -1,0 +1,42 @@
+import numpy as np
+from skimage import io
+from skimage.transform import rotate
+from skimage.color import rgb2gray
+from deskew import determine_skew
+import cv2
+import pytesseract
+from matplotlib import pyplot as plt
+try:
+    from PIL import Image
+except ImportError:
+    import Image
+
+image1 = Image.open("C:/Users/bandl/Desktop/Pic Repository/blur_skew1.jpeg")
+pytesseract.image_to_string(image1, lang ='eng')
+
+def deskew(_img):
+    image = io.imread(_img)
+    grayscale = rgb2gray(image)
+    angle = determine_skew(grayscale)
+    rotated = rotate(image, angle, resize=True) * 255
+    return rotated.astype(np.uint8)
+    
+def angleskew(_imggray):
+    image1 = io.imread(_imggray)
+    grayscale = rgb2gray(image1)
+    angle = determine_skew(grayscale)
+    print("De-skewed Angle: ", angle)
+    
+def display_avant_apres(_original):
+    plt.subplot(1, 2, 1)
+    plt.imshow(io.imread(_original))
+    deskew1= deskew(_original)
+    plt.title('Original Image')
+    plt.subplot(1, 2, 2)
+    plt.imshow(deskew(_original))
+    plt.title('De-skewed Image')
+    plt.show()
+    cv2.imwrite("Deskewed Img.jpg", deskew1 )
+    
+display_avant_apres("C:/Users/bandl/Desktop/Pic Repository/blur_skew1.jpeg")
+angleskew("C:/Users/bandl/Desktop/Pic Repository/blur_skew1.jpeg")
